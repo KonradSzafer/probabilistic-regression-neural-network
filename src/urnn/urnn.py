@@ -49,8 +49,8 @@ class URNN(nn.Module):
         return output, probability
 
 
-    def digitalize(self, input: Tensor) -> Tensor:
-        # conversion
+    def digitize(self, input: Tensor) -> Tensor:
+        # type conversion
         if torch.is_tensor(input):
             input = input.detach().cpu().numpy()
         elif type(input) is List:
@@ -93,7 +93,7 @@ if __name__ == '__main__':
     )
 
     target = torch.FloatTensor([0.1, 0.3, 0.5, 0.7, 0.9])
-    target = model.digitalize(target)
+    target = model.digitize(target)
     print('Target:', target)
 
     x = torch.FloatTensor([
