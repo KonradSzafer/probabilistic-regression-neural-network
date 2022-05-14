@@ -34,19 +34,19 @@ class URNN(nn.Module):
             nn.Linear(1000, 800),
             nn.ReLU(),
             nn.Linear(800, latent_resolution),
-            nn.Softmax()
+            nn.Softmax(dim=0)
         )
 
 
-    # private?
     def digitalize(self, input: Tensor) -> Tensor:
         # conversion
         if torch.is_tensor(input):
             input = input.detach().cpu().numpy()
-        if type(input) is List:
+        elif type(input) is List:
             input = np.array(input)
         # digitalize
         output = np.digitize(input, self.bins)
+        output -= 1
         output = torch.from_numpy(output)
         return output
 
@@ -54,9 +54,22 @@ class URNN(nn.Module):
     def loss(self, input: Tensor, target: Tensor) -> Tensor:
 
         if not len(input) == len(target):
-            raise ValueError('Input and target size dont match')
+            raise ValueError('Input and target size must match')
 
-        return None
+        samples_count = input.shape[0]
+        classes_count = input.shape[1]
+
+        output = torch.zeros(samples_count)
+        for i, target_idx in enumerate(target):
+            # calculate loss for each target separately
+            loss = 0
+            for probability_idx in range(classes_count):
+                probability_value = input[i, probability_idx]
+                bin_dist = abs(target_idx - probability_idx)
+                loss += probability_value * bin_dist
+            output[i] = loss
+
+        return output
 
 
 if __name__ == '__main__':
@@ -78,5 +91,5 @@ if __name__ == '__main__':
         [0.2, 0.2, 0.2, 0.2, 0.2],
         [0.6, 0.2, 0.1, 0.09, 0.01]
     ])
-    out = model.loss(x, target)
-    print(out)
+    output = model.loss(x, target)
+    print('Loss:', output)
