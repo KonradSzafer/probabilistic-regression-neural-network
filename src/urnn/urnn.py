@@ -24,11 +24,11 @@ class URNN(nn.Module):
         self.bins = np.linspace(
             self.min_value,
             self.max_value,
-            num=self.latent_res
+            num=self.latent_res+1
         )
 
         # neural network
-        self.regressor = nn.Sequential(
+        self.model = nn.Sequential(
             nn.Linear(input_size, 1000),
             nn.ReLU(),
             nn.Linear(1000, 800),
@@ -36,6 +36,17 @@ class URNN(nn.Module):
             nn.Linear(800, latent_resolution),
             nn.Softmax(dim=0)
         )
+
+
+    def forward(self, x):
+        output = self.model(x)
+        return output
+
+
+    def estimate_output(self, x):
+        output: float = None
+        probability: float = None
+        return output, probability
 
 
     def digitalize(self, input: Tensor) -> Tensor:
@@ -81,14 +92,15 @@ if __name__ == '__main__':
         latent_resolution=5
     )
 
-    target = torch.FloatTensor([0.1, 0.5, 0.02, 2.0])
+    target = torch.FloatTensor([0.1, 0.3, 0.5, 0.7, 0.9])
     target = model.digitalize(target)
     print('Target:', target)
 
     x = torch.FloatTensor([
         [0.7, 0.2, 0.1, 0.0, 0.0],
-        [0.09, 0.2, 0.5, 0.2, 0.01],
+        [0.09, 0.5, 0.2, 0.2, 0.01],
         [0.2, 0.2, 0.2, 0.2, 0.2],
+        [0.6, 0.2, 0.1, 0.09, 0.01],
         [0.6, 0.2, 0.1, 0.09, 0.01]
     ])
     output = model.loss(x, target)
