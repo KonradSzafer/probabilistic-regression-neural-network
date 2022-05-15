@@ -4,6 +4,7 @@ from torch import nn
 from typing import List
 
 Tensor = torch.Tensor
+torch.autograd.set_detect_anomaly(True)
 
 
 class URNN(nn.Module):
@@ -26,15 +27,14 @@ class URNN(nn.Module):
             self.max_value,
             num=self.latent_res+1
         )
+        print(self.bins)
 
         # neural network
         self.model = nn.Sequential(
-            nn.Linear(input_size, 1000),
+            nn.Linear(input_size, 100),
             nn.ReLU(),
-            nn.Linear(1000, 800),
-            nn.ReLU(),
-            nn.Linear(800, latent_resolution),
-            nn.Softmax(dim=0)
+            nn.Linear(100, latent_resolution),
+            nn.Softmax()
         )
 
 
@@ -49,6 +49,13 @@ class URNN(nn.Module):
         return output, probability
 
 
+    @property
+    def print_bins(self):
+        print(self.bins)
+        # for i in range(0, len(self.bins)-1):
+        #     print(i, self.bins[i], self.bins[i+1])
+
+
     def digitize(self, input: Tensor) -> Tensor:
         # type conversion
         if torch.is_tensor(input):
@@ -56,7 +63,12 @@ class URNN(nn.Module):
         elif type(input) is List:
             input = np.array(input)
         # digitalize
-        output = np.digitize(input, self.bins)
+        output = np.digitize(
+            input,
+            self.bins,
+            right=False
+        )
+        # classes starting from 0
         output -= 1
         output = torch.from_numpy(output)
         return output
@@ -83,12 +95,15 @@ class URNN(nn.Module):
         return output
 
 
+# class loss()
+
+
 if __name__ == '__main__':
 
     model = URNN(
         input_size=10,
         min_value=0.0,
-        max_value=1.0,
+        max_value=1+1e-2, # must be little above the range of values
         latent_resolution=5
     )
 

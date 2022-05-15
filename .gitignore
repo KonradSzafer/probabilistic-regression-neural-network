@@ -9,3 +9,6 @@ runs/
 # IDE
 .idea
 .vscode
+
+# Model tracking
+wandb/
