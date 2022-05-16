@@ -27,7 +27,6 @@ class URNN(nn.Module):
             self.max_value,
             num=self.latent_res+1
         )
-        print(self.bins)
 
         # neural network
         self.model = nn.Sequential(
@@ -49,11 +48,14 @@ class URNN(nn.Module):
         return output, probability
 
 
-    @property
-    def print_bins(self):
-        print(self.bins)
-        # for i in range(0, len(self.bins)-1):
-        #     print(i, self.bins[i], self.bins[i+1])
+    def print_bins(self) -> None:
+        print('class idx | bin min | bin max')
+        for i in range(0, len(self.bins)-1):
+            print(
+                '%d:' % i, \
+                '<%.4f,' % self.bins[i], \
+                '%.4f)' % self.bins[i+1] \
+            )
 
 
     def digitize(self, input: Tensor) -> Tensor:
@@ -95,9 +97,6 @@ class URNN(nn.Module):
         return output
 
 
-# class loss()
-
-
 if __name__ == '__main__':
 
     model = URNN(
@@ -106,6 +105,7 @@ if __name__ == '__main__':
         max_value=1+1e-2, # must be little above the range of values
         latent_resolution=5
     )
+    model.print_bins()
 
     target = torch.FloatTensor([0.1, 0.3, 0.5, 0.7, 0.9])
     target = model.digitize(target)
