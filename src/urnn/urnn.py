@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 import torch
 from torch import nn
 from typing import List
@@ -33,7 +34,7 @@ class URNN(nn.Module):
             nn.Linear(input_size, 100),
             nn.ReLU(),
             nn.Linear(100, latent_resolution),
-            nn.Softmax()
+            nn.Softmax(dim=1)
         )
 
 
@@ -97,10 +98,23 @@ class URNN(nn.Module):
         return output
 
 
+    def predict_sample(self, input: Tensor) -> Tensor:
+
+        output = self.model(input.unsqueeze(0))
+        output = output.detach().numpy().squeeze(0)
+
+        plt.bar(np.arange(len(output)), output)
+        plt.xlabel('Bin index')
+        plt.ylabel('Probability')
+        plt.show()
+
+        return torch.from_numpy(output)
+
+
 if __name__ == '__main__':
 
     model = URNN(
-        input_size=10,
+        input_size=3,
         min_value=0.0,
         max_value=1+1e-2, # must be little above the range of values
         latent_resolution=5
@@ -120,3 +134,6 @@ if __name__ == '__main__':
     ])
     output = model.loss(x, target)
     print('Loss:', output)
+
+    x = Tensor([0, 0.04, 0.07])
+    model.predict_sample(x)
