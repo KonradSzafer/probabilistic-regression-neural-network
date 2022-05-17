@@ -15,19 +15,27 @@ class URNN(nn.Module):
             input_size: int,
             min_value: float=0,
             max_value: float=1,
-            latent_resolution: int=10
+            latent_resolution: int=10,
+            plot_bin_precision: int=3
         ):
         super(URNN, self).__init__()
 
         self.min_value = min_value
         self.max_value = max_value
         self.latent_res = latent_resolution
+        self.plot_bin_precision = plot_bin_precision
 
+        # bins for NN and ploting
         self.bins = np.linspace(
             self.min_value,
             self.max_value,
             num=self.latent_res+1
         )
+        self.bins_dict = {}
+        for i in range(len(self.bins)-1):
+            self.bins_dict[i] = '<' + \
+                str(f'{self.bins[i]:.{self.plot_bin_precision}f}') + ', ' + \
+                str(f'{self.bins[i+1]:.{self.plot_bin_precision}f}') + ')'
 
         # neural network
         self.model = nn.Sequential(
@@ -51,12 +59,8 @@ class URNN(nn.Module):
 
     def print_bins(self) -> None:
         print('class idx | bin min | bin max')
-        for i in range(0, len(self.bins)-1):
-            print(
-                '%d:' % i, \
-                '<%.4f,' % self.bins[i], \
-                '%.4f)' % self.bins[i+1] \
-            )
+        for i, bins in self.bins_dict.items():
+            print('%d:' % i, bins)
 
 
     def digitize(self, input: Tensor) -> Tensor:
@@ -104,6 +108,7 @@ class URNN(nn.Module):
         output = output.detach().numpy().squeeze(0)
 
         plt.bar(np.arange(len(output)), output)
+        plt.xticks(np.arange(len(output)), self.bins_dict.values(), rotation=45);
         plt.xlabel('Bin index')
         plt.ylabel('Probability')
         plt.show()
