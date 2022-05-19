@@ -102,9 +102,7 @@ class URNN(nn.Module):
         return output
 
 
-    def predict_sample(self, input: Tensor) -> Tensor:
-
-        output = self.model(input.unsqueeze(0))
+    def plot_prediction(self, output: Tensor) -> None:
         output = output.detach().numpy().squeeze(0)
 
         plt.bar(np.arange(len(output)), output)
@@ -113,7 +111,16 @@ class URNN(nn.Module):
         plt.ylabel('Probability')
         plt.show()
 
-        return torch.from_numpy(output)
+
+    def predict_sample(self, input: Tensor) -> Tensor:
+        output = self.model(input.unsqueeze(0))
+        _, label = torch.max(output, 1)
+        label = label.item()
+        bin = self.bins_dict[label]
+
+        self.plot_prediction(output)
+
+        return output, label, bin
 
 
 if __name__ == '__main__':
