@@ -42,7 +42,7 @@ class URNN(nn.Module):
             nn.Linear(input_size, 100),
             nn.ReLU(),
             nn.Linear(100, latent_resolution),
-            nn.Softmax(dim=1)
+            # nn.Softmax(dim=1)
         )
 
 
@@ -95,7 +95,7 @@ class URNN(nn.Module):
             loss = 0
             for probability_idx in range(classes_count):
                 probability_value = input[i, probability_idx]
-                bin_dist = abs(target_idx - probability_idx)
+                bin_dist = torch.abs(target_idx - probability_idx)
                 loss += probability_value * bin_dist
             output[i] = loss
 
@@ -103,8 +103,8 @@ class URNN(nn.Module):
 
 
     def plot_prediction(self, output: Tensor) -> None:
-        output = output.detach().numpy().squeeze(0)
-
+        output = output.detach().squeeze(0)
+        output = output.numpy()
         plt.bar(np.arange(len(output)), output)
         plt.xticks(np.arange(len(output)), self.bins_dict.values(), rotation=45);
         plt.xlabel('Bin index')
