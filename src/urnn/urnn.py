@@ -40,9 +40,10 @@ class URNN(nn.Module):
         # neural network
         self.model = nn.Sequential(
             nn.Linear(input_size, 100),
-            nn.ReLU(),
+            # nn.ReLU(),
+            nn.Tanh(),
             nn.Linear(100, latent_resolution),
-            # nn.Softmax(dim=1)
+            nn.Softmax(dim=1)
         )
 
 
@@ -81,29 +82,10 @@ class URNN(nn.Module):
         return output
 
 
-    def loss(self, input: Tensor, target: Tensor) -> Tensor:
-
-        if not len(input) == len(target):
-            raise ValueError('Input and target size must match')
-
-        samples_count = input.shape[0]
-        classes_count = input.shape[1]
-
-        output = torch.zeros(samples_count)
-        for i, target_idx in enumerate(target):
-            # calculate loss for each target separately
-            loss = 0
-            for probability_idx in range(classes_count):
-                probability_value = input[i, probability_idx]
-                bin_dist = torch.abs(target_idx - probability_idx)
-                loss += probability_value * bin_dist
-            output[i] = loss
-
-        return output
-
-
-    def plot_prediction(self, output: Tensor) -> None:
+    def plot_prediction(self, output: Tensor, normalize: bool=True) -> None:
         output = output.detach().squeeze(0)
+        if normalize:
+            output = nn.Softmax(dim=0)(output)
         output = output.numpy()
         plt.bar(np.arange(len(output)), output)
         plt.xticks(np.arange(len(output)), self.bins_dict.values(), rotation=45);
