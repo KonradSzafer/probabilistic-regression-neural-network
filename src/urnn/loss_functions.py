@@ -11,8 +11,8 @@ def dist_loss(input: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
 
     samples_count = input.shape[0]
     classes_count = input.shape[1]
+    output = torch.zeros(samples_count, dtype=torch.float16) #, requires_grad=True)
 
-    output = torch.zeros(samples_count)
     for i, target_idx in enumerate(target):
         # calculate loss for each target separately
         loss = 0
@@ -21,7 +21,7 @@ def dist_loss(input: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
             bin_dist = torch.abs(target_idx - probability_idx)
             loss += probability_value * bin_dist
         output[i] = loss
-
+        # output.data[i] = loss
     return output
 
 
@@ -42,3 +42,10 @@ def focal_loss(
     elif reduction == 'sum':
         loss = loss.sum()
     return loss
+
+
+if __name__ == '__main__':
+
+    input = torch.FloatTensor([[0.2, 0.3, 0.1, 0.4]])
+    target = torch.FloatTensor([[1]])
+    loss = dist_loss(input, target)

@@ -43,7 +43,7 @@ class URNN(nn.Module):
             # nn.ReLU(),
             nn.Tanh(),
             nn.Linear(100, latent_resolution),
-            nn.Softmax(dim=1)
+            # nn.Softmax(dim=1)
         )
 
 
@@ -86,7 +86,7 @@ class URNN(nn.Module):
         output = output.detach().squeeze(0)
         if normalize:
             output = nn.Softmax(dim=0)(output)
-        output = output.numpy()
+        output = output.cpu().numpy()
         plt.bar(np.arange(len(output)), output)
         plt.xticks(np.arange(len(output)), self.bins_dict.values(), rotation=45);
         plt.xlabel('Bin index')
@@ -126,7 +126,9 @@ if __name__ == '__main__':
         [0.6, 0.2, 0.1, 0.09, 0.01],
         [0.6, 0.2, 0.1, 0.09, 0.01]
     ])
-    output = model.loss(x, target)
+
+    from loss_functions import dist_loss
+    output = dist_loss(x, target)
     print('Loss:', output)
 
     x = Tensor([0, 0.04, 0.07])
