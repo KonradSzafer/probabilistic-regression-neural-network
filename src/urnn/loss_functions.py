@@ -34,7 +34,7 @@ def focal_loss(
     reduction: str='none'
     ) -> torch.Tensor:
 
-    ce_loss = F.cross_entropy(input, target, reduction='none') # weight=weight,
+    ce_loss = F.cross_entropy(input, target, reduction='sum') # weight=weight,
     p_t = torch.exp(-ce_loss)
     loss = (1 - p_t)**gamma * ce_loss
     if reduction =='mean':

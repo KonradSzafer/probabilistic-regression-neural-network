@@ -82,7 +82,15 @@ class URNN(nn.Module):
         return output
 
 
-    def plot_prediction(self, output: Tensor, normalize: bool=True) -> None:
+    def predict_sample(self, input: Tensor, normalize: bool=True, plot_distribution: bool=False) -> Tensor:
+        output = self.model(input.unsqueeze(0))
+        _, label = torch.max(output, 1)
+        label = label.item()
+        bin = self.bins_dict[label]
+        return output, label, bin
+
+
+    def plot_latent_distribution(self, output: Tensor, normalize: bool=True) -> None:
         output = output.detach().squeeze(0)
         if normalize:
             output = nn.Softmax(dim=0)(output)
@@ -94,15 +102,8 @@ class URNN(nn.Module):
         plt.show()
 
 
-    def predict_sample(self, input: Tensor) -> Tensor:
-        output = self.model(input.unsqueeze(0))
-        _, label = torch.max(output, 1)
-        label = label.item()
-        bin = self.bins_dict[label]
-
-        self.plot_prediction(output)
-
-        return output, label, bin
+    def estimate_value(self, input: Tensor) -> Tensor:
+        pass
 
 
 if __name__ == '__main__':
