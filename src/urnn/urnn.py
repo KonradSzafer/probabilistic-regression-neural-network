@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from statistics import mean
 import torch
 from torch import nn
 from typing import List
@@ -31,9 +32,14 @@ class URNN(nn.Module):
             self.max_value,
             num=self.latent_res+1
         )
-        self.bins_dict = {}
+        self.bins_val_dict = {}
+        self.bins_str_dict = {}
         for i in range(len(self.bins)-1):
-            self.bins_dict[i] = '<' + \
+            self.bins_val_dict[i] = [
+                np.round(self.bins[i], self.plot_bin_precision),
+                np.round(self.bins[i+1], self.plot_bin_precision)
+            ]
+            self.bins_str_dict[i] = '<' + \
                 str(f'{self.bins[i]:.{self.plot_bin_precision}f}') + ', ' + \
                 str(f'{self.bins[i+1]:.{self.plot_bin_precision}f}') + ')'
 
@@ -52,15 +58,9 @@ class URNN(nn.Module):
         return output
 
 
-    def estimate_output(self, x):
-        output: float = None
-        probability: float = None
-        return output, probability
-
-
     def print_bins(self) -> None:
         print('class idx | bin min | bin max')
-        for i, bins in self.bins_dict.items():
+        for i, bins in self.bins_str_dict.items():
             print('%d:' % i, bins)
 
 
@@ -86,7 +86,7 @@ class URNN(nn.Module):
         output = self.model(input.unsqueeze(0))
         _, label = torch.max(output, 1)
         label = label.item()
-        bin = self.bins_dict[label]
+        bin = self.bins_val_dict[label]
         return output, label, bin
 
 
@@ -96,14 +96,16 @@ class URNN(nn.Module):
             output = nn.Softmax(dim=0)(output)
         output = output.cpu().numpy()
         plt.bar(np.arange(len(output)), output)
-        plt.xticks(np.arange(len(output)), self.bins_dict.values(), rotation=45);
+        plt.xticks(np.arange(len(output)), self.bins_str_dict.values(), rotation=45);
         plt.xlabel('Bin index')
         plt.ylabel('Probability')
         plt.show()
 
 
-    def estimate_value(self, input: Tensor) -> Tensor:
-        pass
+    def estimate_value(self, input: Tensor, method='default') -> Tensor: # output
+        output: float = 0
+        probability: float = 0
+        return output, probability
 
 
 if __name__ == '__main__':
@@ -133,4 +135,8 @@ if __name__ == '__main__':
     print('Loss:', output)
 
     x = Tensor([0, 0.04, 0.07])
-    model.predict_sample(x)
+    output, label, bin = model.predict_sample(x)
+    print(output, label, bin)
+
+    value, probability = model.estimate_value(output)
+    print('value:', value, 'probability:', probability)
