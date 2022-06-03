@@ -82,7 +82,12 @@ class URNN(nn.Module):
         return output
 
 
-    def predict_sample(self, input: Tensor, normalize: bool=True, plot_distribution: bool=False) -> Tensor:
+    def predict_sample(
+        self,
+        input: Tensor,
+        normalize: bool=True,
+        plot_distribution: bool=False
+        ) -> Tensor:
         output = self.model(input.unsqueeze(0))
         _, label = torch.max(output, 1)
         label = label.item()
@@ -102,10 +107,31 @@ class URNN(nn.Module):
         plt.show()
 
 
-    def estimate_value(self, input: Tensor, method='default') -> Tensor: # output
-        output: float = 0
-        probability: float = 0
-        return output, probability
+    def estimate(self, input: Tensor, method='default') -> Tensor:
+
+        # check dimensions
+        tensors_count, latent_size = input.shape
+        assert (
+            latent_size == self.latent_res,
+            f'incopatible latient size, expected {self.latent_res} got {latent_size}'
+        )
+
+        # output tensors
+        value = torch.zeros([tensors_count, 1], dtype=torch.float16)
+        probability = torch.zeros([tensors_count, 1], dtype=torch.float16)
+
+        # normalization
+        input = nn.Softmax(dim=1)(input)
+
+        for i in range(tensors_count):
+            output: float = 0
+            for j in range(latent_size):
+                bin_mid = mean(self.bins_val_dict[j])
+                bin_prob = input[i,j].item()
+                output += bin_mid * bin_prob
+            value[i,0] = output
+            probability[i,0], _ = torch.max(input[i], dim=-1)
+        return value, probability
 
 
 if __name__ == '__main__':
@@ -138,5 +164,5 @@ if __name__ == '__main__':
     output, label, bin = model.predict_sample(x)
     print(output, label, bin)
 
-    value, probability = model.estimate_value(output)
+    value, probability = model.estimate(output)
     print('value:', value, 'probability:', probability)
