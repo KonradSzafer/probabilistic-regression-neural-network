@@ -9,7 +9,7 @@ Tensor = torch.Tensor
 torch.autograd.set_detect_anomaly(True)
 
 
-class URNN(nn.Module):
+class PRNN(nn.Module):
 
     def __init__(
             self,
@@ -19,7 +19,7 @@ class URNN(nn.Module):
             latent_resolution: int=10,
             intervals_precision: int=3
         ):
-        super(URNN, self).__init__()
+        super(PRNN, self).__init__()
 
         self.min_value = min_value
         self.max_value = max_value
@@ -102,7 +102,7 @@ class URNN(nn.Module):
         output = output.cpu().numpy()
         plt.bar(np.arange(len(output)), output)
         plt.xticks(np.arange(len(output)), self.intervals_str_dict.values(), rotation=45);
-        plt.xlabel('Interval index')
+        plt.xlabel('Interval')
         plt.ylabel('Probability')
         plt.show()
 
@@ -136,7 +136,7 @@ class URNN(nn.Module):
 
 if __name__ == '__main__':
 
-    model = URNN(
+    model = PRNN(
         input_size=3,
         min_value=0.0,
         max_value=1+1e-2, # must be little above the range of values
