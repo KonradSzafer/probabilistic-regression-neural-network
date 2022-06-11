@@ -98,7 +98,7 @@ class URNN(nn.Module):
     def plot_latent_distribution(self, output: Tensor, normalize: bool=True) -> None:
         output = output.detach().squeeze(0)
         if normalize:
-            output = nn.Softmax(dim=0)(output)
+            output = nn.Softmax(dim=-1)(output)
         output = output.cpu().numpy()
         plt.bar(np.arange(len(output)), output)
         plt.xticks(np.arange(len(output)), self.bins_str_dict.values(), rotation=45);
@@ -121,7 +121,7 @@ class URNN(nn.Module):
         probability = torch.zeros([tensors_count, 1], dtype=torch.float16)
 
         # normalization
-        input = nn.Softmax(dim=1)(input)
+        input = nn.Softmax(dim=-1)(input)
 
         for i in range(tensors_count):
             output: float = 0

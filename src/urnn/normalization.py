@@ -50,12 +50,10 @@ def LeakyReLU(x, negative_slope=0.1):
     return y
 
 
-if __name__ == '__main__':
-    # x = torch.linspace(-1.5, .95, steps=15)
-    # x = torch.linspace(-1.5, .95, steps=200)
-    x = torch.linspace(-3.5, 1.5, steps=30)
+def plot_functions(x):
     plt.plot(x, LinearlyNormalized(x), label='Linearly Normalized')
     plt.plot(x, Softmax(x), label='Softmax')
+    plt.plot(x, ExpSoftmax(x, factor=0.5), label='Exp Softmax 0.5')
     plt.plot(x, ExpSoftmax(x, factor=1.0), label='Exp Softmax 1.0')
     plt.plot(x, ExpSoftmax(x, factor=1.5), label='Exp Softmax 1.5')
     plt.plot(x, Sigmoid(x), label='Sigmoid')
@@ -66,3 +64,15 @@ if __name__ == '__main__':
     plt.ylabel('probability')
     # plt.savefig('normalization_functions.png')
     plt.show()
+
+
+if __name__ == '__main__':
+
+    # x = torch.linspace(-1.5, .95, steps=15)
+    # x = torch.linspace(-1.5, .95, steps=200)
+
+    x = torch.linspace(-3.5, 1.5, steps=30)
+    plot_functions(x)
+
+    x = torch.linspace(-8.5, 2.5, steps=30)
+    plot_functions(x)
