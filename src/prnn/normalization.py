@@ -1,7 +1,9 @@
 import torch
+from torch import Tensor
 import torch.nn as nn
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
+from typing import Optional
 
 
 def MinMaxNormalizer(x):
@@ -14,51 +16,74 @@ def ProbabilityNormalizer(x):
     return y
 
 
-def LinearlyNormalized(x):
-    y = MinMaxNormalizer(x)
-    y = ProbabilityNormalizer(y)
-    return y
+class Linear(nn.Module):
+    def __init__(self) -> None:
+        super(Linear, self).__init__()
+
+    def __call__(self, x) -> Tensor:
+        y = MinMaxNormalizer(x)
+        y = ProbabilityNormalizer(y)
+        return y
 
 
-def Softmax(x):
-    y = nn.Softmax(dim=-1)(x)
-    return y
+class ExpSoftmax(nn.Module):
+    def __init__(
+            self,
+            dim: Optional[int] = None,
+            factor: Optional[float] = 1.0
+        ) -> None:
+        super(ExpSoftmax, self).__init__()
+        self.dim = dim
+        self.factor = factor
+
+    def __call__(self, x):
+        y = self.factor * torch.exp(x)
+        y = nn.Softmax(dim=self.dim)(y)
+        return y
 
 
-def ExpSoftmax(x, factor: float=1.0):
-    x = factor * torch.exp(x)
-    y = nn.Softmax(dim=-1)(x)
-    return y
+class Sigmoid(nn.Module):
+    def __init__(self) -> None:
+        super(Sigmoid, self).__init__()
+
+    def __call__(self, x) -> Tensor:
+        y = nn.Sigmoid()(x)
+        y = ProbabilityNormalizer(y)
+        return y
 
 
-def Sigmoid(x):
-    y = nn.Sigmoid()(x)
-    y = ProbabilityNormalizer(y)
-    return y
+class ReLU(nn.Module):
+    def __init__(self) -> None:
+        super(ReLU, self).__init__()
+
+    def __call__(self, x) -> Tensor:
+        y = nn.ReLU()(x)
+        y = ProbabilityNormalizer(y)
+        return y
 
 
-def ReLU(x):
-    y = nn.ReLU()(x)
-    y = ProbabilityNormalizer(y)
-    return y
+class LeakyReLU(nn.Module):
+    def __init__(
+            self,
+            negative_slope: Optional[float] = 0.1
+        ) -> None:
+        super(LeakyReLU, self).__init__()
+        self.negative_slope = negative_slope
 
-
-def LeakyReLU(x, negative_slope=0.1):
-    y = nn.LeakyReLU(negative_slope)(x)
-    y = torch.add(y, -torch.min(y))
-    y = ProbabilityNormalizer(y)
-    return y
+    def __call__(self, x) -> Tensor:
+        y = nn.LeakyReLU(self.negative_slope)(x)
+        y = torch.add(y, -torch.min(y))
+        y = ProbabilityNormalizer(y)
+        return y
 
 
 def plot_functions(x):
-    plt.plot(x, LinearlyNormalized(x), label='Linearly Normalized')
-    plt.plot(x, Softmax(x), label='Softmax')
-    plt.plot(x, ExpSoftmax(x, factor=0.5), label='Exp Softmax 0.5')
-    plt.plot(x, ExpSoftmax(x, factor=1.0), label='Exp Softmax 1.0')
-    plt.plot(x, ExpSoftmax(x, factor=1.5), label='Exp Softmax 1.5')
-    plt.plot(x, Sigmoid(x), label='Sigmoid')
-    plt.plot(x, LeakyReLU(x, negative_slope=0.1), label='Leaky ReLU 0.1')
-    plt.plot(x, ReLU(x), label='ReLU') # dont sum to 1.
+    plt.plot(x, Linear()(x), label='Linear')
+    plt.plot(x, nn.Softmax(dim=-1)(x), label='Softmax')
+    plt.plot(x, ExpSoftmax(dim=-1, factor=0.5)(x), label='Exp Softmax 0.5')
+    plt.plot(x, Sigmoid()(x), label='Sigmoid')
+    plt.plot(x, LeakyReLU(negative_slope=0.1)(x), label='Leaky ReLU 0.1')
+    plt.plot(x, ReLU()(x), label='ReLU') # dont sum to 1.
     plt.legend()
     plt.xlabel('neural network output')
     plt.ylabel('probability')
