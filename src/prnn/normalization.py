@@ -6,12 +6,12 @@ import matplotlib.pyplot as plt
 from typing import Optional
 
 
-def MinMaxNormalizer(x):
+def MinMaxNormalizer(x: Tensor) -> Tensor:
     y = (x - torch.min(x)) / (torch.max(x) - torch.min(x))
     return y
 
 
-def ProbabilityNormalizer(x):
+def ProbabilityNormalizer(x: Tensor) -> Tensor:
     y = x / torch.sum(x)
     return y
 
@@ -30,13 +30,13 @@ class ExpSoftmax(nn.Module):
     def __init__(
             self,
             dim: Optional[int] = None,
-            factor: Optional[float] = 1.0
+            factor: Optional[float] = 0.5
         ) -> None:
         super(ExpSoftmax, self).__init__()
         self.dim = dim
         self.factor = factor
 
-    def __call__(self, x):
+    def __call__(self, x) -> Tensor:
         y = self.factor * torch.exp(x)
         y = nn.Softmax(dim=self.dim)(y)
         return y
@@ -77,7 +77,7 @@ class LeakyReLU(nn.Module):
         return y
 
 
-def plot_functions(x):
+def plot_functions(x: Tensor) -> None:
     plt.plot(x, Linear()(x), label='Linear')
     plt.plot(x, nn.Softmax(dim=-1)(x), label='Softmax')
     plt.plot(x, ExpSoftmax(dim=-1, factor=0.5)(x), label='Exp Softmax 0.5')

@@ -5,10 +5,19 @@ import torch
 from torch import nn
 from typing import List
 from prnn.loss_functions import dist_loss
+from prnn.normalization import *
 
 Tensor = torch.Tensor
 torch.autograd.set_detect_anomaly(True)
 
+NORMALIZATION_FUNCTIONS = {
+    'linear': Linear(),
+    'softmax': nn.Softmax(dim=-1),
+    'exp_softmax': ExpSoftmax(dim=-1, factor=0.5),
+    'sigmoid': Sigmoid(),
+    'relu': ReLU(),
+    'leaky_relu': LeakyReLU(negative_slope=0.1)
+}
 
 class PRNN(nn.Module):
 
@@ -96,10 +105,10 @@ class PRNN(nn.Module):
         return output, label, interval
 
 
-    def plot_latent_distribution(self, output: Tensor, normalize: bool=True) -> None:
+    def plot_latent_distribution(self, output: Tensor, normalization: str=None) -> None:
         output = output.detach().squeeze(0)
-        if normalize:
-            output = nn.Softmax(dim=-1)(output)
+        if normalization:
+            output = NORMALIZATION_FUNCTIONS[normalization](output)
         output = output.cpu().numpy()
         plt.bar(np.arange(len(output)), output)
         plt.xticks(np.arange(len(output)), self.intervals_str_dict.values(), rotation=45);
