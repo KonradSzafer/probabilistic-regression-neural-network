@@ -12,3 +12,6 @@ runs/
 
 # Model tracking
 wandb/
+
+# Tests
+.coverage

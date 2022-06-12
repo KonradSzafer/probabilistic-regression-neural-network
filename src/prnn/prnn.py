@@ -31,6 +31,15 @@ class PRNN(nn.Module):
         ):
         super(PRNN, self).__init__()
 
+        assert input_size > 0, \
+            'input size must be greater than 0'
+        assert max_value > min_value, \
+            'max value must be greater than min value'
+        assert latent_resolution > 1, \
+            'latent resolution must be greater than 1'
+        assert intervals_precision > 0, \
+            'intervals precision must be greater than 0'
+
         self.min_value = min_value
         self.max_value = max_value
         self.latent_res = latent_resolution
