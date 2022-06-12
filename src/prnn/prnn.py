@@ -13,7 +13,7 @@ torch.autograd.set_detect_anomaly(True)
 NORMALIZATION_FUNCTIONS = {
     'linear': Linear(),
     'softmax': nn.Softmax(dim=-1),
-    'exp_softmax': ExpSoftmax(dim=-1, factor=0.5),
+    'exp_softmax': ExpSoftmax(dim=-1, factor=0.3),
     'sigmoid': Sigmoid(),
     'relu': ReLU(),
     'leaky_relu': LeakyReLU(negative_slope=0.1)
@@ -102,11 +102,12 @@ class PRNN(nn.Module):
 
 
     def predict_sample(
-        self,
-        input: Tensor,
-        normalize: bool=True,
-        plot_distribution: bool=False
+            self,
+            input: Tensor,
+            normalize: bool=True,
+            plot_distribution: bool=False
         ) -> Tensor:
+
         output = self.model(input.unsqueeze(0))
         _, label = torch.max(output, 1)
         label = label.item()
@@ -114,12 +115,19 @@ class PRNN(nn.Module):
         return output, label, interval
 
 
-    def plot_latent_distribution(self, output: Tensor, normalization: str=None) -> None:
+    def plot_latent_distribution(
+            self,
+            output: Tensor,
+            normalization: str=None,
+            title: str=''
+        ) -> None:
+
         output = output.detach().squeeze(0)
         if normalization:
             output = NORMALIZATION_FUNCTIONS[normalization](output)
         output = output.cpu().numpy()
         plt.bar(np.arange(len(output)), output)
+        plt.title(title)
         plt.xticks(np.arange(len(output)), self.intervals_str_dict.values(), rotation=45);
         plt.xlabel('Interval')
         plt.ylabel('Probability')

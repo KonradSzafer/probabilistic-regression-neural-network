@@ -80,10 +80,12 @@ class LeakyReLU(nn.Module):
 def plot_functions(x: Tensor) -> None:
     plt.plot(x, Linear()(x), label='Linear')
     plt.plot(x, nn.Softmax(dim=-1)(x), label='Softmax')
+    plt.plot(x, ExpSoftmax(dim=-1, factor=0.1)(x), label='Exp Softmax 0.1')
+    plt.plot(x, ExpSoftmax(dim=-1, factor=0.3)(x), label='Exp Softmax 0.3')
     plt.plot(x, ExpSoftmax(dim=-1, factor=0.5)(x), label='Exp Softmax 0.5')
     plt.plot(x, Sigmoid()(x), label='Sigmoid')
     plt.plot(x, LeakyReLU(negative_slope=0.1)(x), label='Leaky ReLU 0.1')
-    plt.plot(x, ReLU()(x), label='ReLU') # dont sum to 1.
+    plt.plot(x, ReLU()(x), label='ReLU')
     plt.legend()
     plt.xlabel('neural network output')
     plt.ylabel('probability')
@@ -92,7 +94,6 @@ def plot_functions(x: Tensor) -> None:
 
 
 if __name__ == '__main__':
-
     # x = torch.linspace(-1.5, .95, steps=15)
     # x = torch.linspace(-1.5, .95, steps=200)
 
