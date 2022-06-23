@@ -26,12 +26,12 @@ class Linear(nn.Module):
         return y
 
 
-class LogSoftmax(nn.Module):
+class Logarithmic(nn.Module):
     def __init__(
             self,
             dim: Optional[int] = None
         ) -> None:
-        super(LogSoftmax, self).__init__()
+        super(Logarithmic, self).__init__()
 
     def __call__(self, x) -> Tensor:
         y = torch.add(x, -torch.min(x)+1)
@@ -95,14 +95,14 @@ class LeakyReLU(nn.Module):
 
 def plot_functions(x: Tensor, save_fig: bool=False) -> None:
     plt.plot(x, nn.Softmax(dim=-1)(x), label='Softmax')
-    plt.plot(x, LogSoftmax(dim=-1)(x), label='Log Softmax')
-    plt.plot(x, ExpSoftmax(dim=-1, factor=0.1)(x), label='Exp Softmax 0.1')
-    plt.plot(x, ExpSoftmax(dim=-1, factor=0.3)(x), label='Exp Softmax 0.3')
-    plt.plot(x, ExpSoftmax(dim=-1, factor=0.5)(x), label='Exp Softmax 0.5')
+    # plt.plot(x, ExpSoftmax(dim=-1, factor=0.1)(x), label='Exp Softmax 0.1')
+    # plt.plot(x, ExpSoftmax(dim=-1, factor=0.3)(x), label='Exp Softmax 0.3')
+    # plt.plot(x, ExpSoftmax(dim=-1, factor=0.5)(x), label='Exp Softmax 0.5')
+    plt.plot(x, Logarithmic(dim=-1)(x), label='Logarithmic')
     plt.plot(x, Sigmoid()(x), label='Sigmoid')
-    plt.plot(x, Linear()(x), label='Linear')
-    plt.plot(x, LeakyReLU(negative_slope=0.1)(x), label='Leaky ReLU 0.1')
-    plt.plot(x, ReLU()(x), label='ReLU')
+    # plt.plot(x, Linear()(x), label='Linear')
+    # plt.plot(x, LeakyReLU(negative_slope=0.1)(x), label='Leaky ReLU 0.1')
+    # plt.plot(x, ReLU()(x), label='ReLU')
     plt.legend()
     plt.xlabel('neural network output')
     plt.ylabel('probability')
@@ -116,7 +116,7 @@ if __name__ == '__main__':
     # x = torch.linspace(-1.5, .95, steps=200)
 
     x = torch.linspace(-3.5, 1.5, steps=30)
-    plot_functions(x, False)
+    plot_functions(x, True)
 
     x = torch.linspace(-8.5, 2.5, steps=30)
     plot_functions(x, False)

@@ -12,8 +12,8 @@ torch.autograd.set_detect_anomaly(True)
 
 NORMALIZATION_FUNCTIONS = {
     'softmax': nn.Softmax(dim=-1),
-    'log_softmax': LogSoftmax(),
     'exp_softmax': ExpSoftmax(dim=-1, factor=0.1),
+    'logarithmic': Logarithmic(),
     'sigmoid': Sigmoid(),
     'linear': Linear(),
     'relu': ReLU(),

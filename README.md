@@ -22,7 +22,7 @@ The size of the last learning layer is determined by the number of different int
     <img src="images/architecture_1.png" alt="drawing" width="910"/>
 </p>
 
-Since it has been proven that modern deep neural networks tend to be overconfident [2], probability normalization functions other than Softmax have been proposed.
+Since it has been proven that modern deep neural networks tend to be overconfident [2], a modified Softmax and other probability normalization functions have been proposed.
 
 <p align="center">
     <img src="images/layer_norms_1.jpg" alt="drawing" width="300"/>
@@ -32,6 +32,8 @@ Since it has been proven that modern deep neural networks tend to be overconfide
 
 ## 3. Results
 ----------
+
+Simple example of interval probabilities distribution.
 
 <p align="center">
     <img src="images/latient_distribution_softmax_0.jpg" alt="drawing" width="910"/>
