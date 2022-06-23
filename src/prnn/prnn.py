@@ -11,10 +11,11 @@ Tensor = torch.Tensor
 torch.autograd.set_detect_anomaly(True)
 
 NORMALIZATION_FUNCTIONS = {
-    'linear': Linear(),
     'softmax': nn.Softmax(dim=-1),
-    'exp_softmax': ExpSoftmax(dim=-1, factor=0.3),
+    'log_softmax': LogSoftmax(),
+    'exp_softmax': ExpSoftmax(dim=-1, factor=0.1),
     'sigmoid': Sigmoid(),
+    'linear': Linear(),
     'relu': ReLU(),
     'leaky_relu': LeakyReLU(negative_slope=0.1)
 }
@@ -119,7 +120,9 @@ class PRNN(nn.Module):
             self,
             output: Tensor,
             normalization: str=None,
-            title: str=''
+            title: str='',
+            filename: str='',
+            dpi: int=200
         ) -> None:
 
         output = output.detach().squeeze(0)
@@ -131,6 +134,8 @@ class PRNN(nn.Module):
         plt.xticks(np.arange(len(output)), self.intervals_str_dict.values(), rotation=45);
         plt.xlabel('Interval')
         plt.ylabel('Probability')
+        if filename:
+            plt.savefig(filename, dpi=dpi)
         plt.show()
 
 
