@@ -93,7 +93,7 @@ class LeakyReLU(nn.Module):
         return y
 
 
-def plot_functions(x: Tensor) -> None:
+def plot_functions(x: Tensor, save_fig: bool=False) -> None:
     plt.plot(x, nn.Softmax(dim=-1)(x), label='Softmax')
     plt.plot(x, LogSoftmax(dim=-1)(x), label='Log Softmax')
     plt.plot(x, ExpSoftmax(dim=-1, factor=0.1)(x), label='Exp Softmax 0.1')
@@ -106,7 +106,8 @@ def plot_functions(x: Tensor) -> None:
     plt.legend()
     plt.xlabel('neural network output')
     plt.ylabel('probability')
-    # plt.savefig('layer_norms_1.png')
+    if save_fig:
+        plt.savefig('layer_norms_1.jpg', dpi=200)
     plt.show()
 
 
@@ -115,7 +116,7 @@ if __name__ == '__main__':
     # x = torch.linspace(-1.5, .95, steps=200)
 
     x = torch.linspace(-3.5, 1.5, steps=30)
-    plot_functions(x)
+    plot_functions(x, False)
 
     x = torch.linspace(-8.5, 2.5, steps=30)
-    plot_functions(x)
+    plot_functions(x, False)
