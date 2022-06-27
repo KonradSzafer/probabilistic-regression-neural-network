@@ -96,9 +96,11 @@ class PRNN(nn.Module):
             self.intervals,
             right=False
         )
-        # classes starting from 0
+        # start class labels from 0
         output -= 1
+        # torch conversion
         output = torch.from_numpy(output)
+        output = output.type(torch.FloatTensor)
         return output
 
 
