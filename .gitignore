@@ -16,3 +16,7 @@ wandb/
 # Tests
 .coverage
 .pytest_cache
+
+# Data
+data/*.*
+!data/.gitkeep
