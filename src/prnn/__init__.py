@@ -1,1 +1,1 @@
-from .prnn import PRNN
+from .prnn import PRNN, normalization_functions

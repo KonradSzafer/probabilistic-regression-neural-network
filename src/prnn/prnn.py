@@ -10,7 +10,7 @@ from prnn.normalization import *
 Tensor = torch.Tensor
 torch.autograd.set_detect_anomaly(True)
 
-NORMALIZATION_FUNCTIONS = {
+normalization_functions = {
     'softmax': nn.Softmax(dim=-1),
     'exp_softmax': ExpSoftmax(dim=-1, factor=0.1),
     'logarithmic': Logarithmic(),
@@ -127,7 +127,7 @@ class PRNN(nn.Module):
 
         output = output.detach().squeeze(0)
         if normalization:
-            output = NORMALIZATION_FUNCTIONS[normalization](output)
+            output = normalization_functions[normalization](output)
         output = output.cpu().numpy()
         plt.bar(np.arange(len(output)), output)
         plt.title(title)
