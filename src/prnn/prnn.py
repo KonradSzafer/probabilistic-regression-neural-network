@@ -147,7 +147,7 @@ class PRNN(nn.Module):
         tensors_count, latent_size = input.shape
         assert \
             latent_size == self.latent_res, \
-            f'incopatible latient size, expected \
+            f'incompatible latient size, expected \
             {self.latent_res} got {latent_size}'
 
         # output tensors
